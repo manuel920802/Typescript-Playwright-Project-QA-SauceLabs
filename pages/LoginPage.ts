@@ -7,6 +7,7 @@ export class LoginPage extends BasePage {
   private readonly passwordInput: Locator;
   private readonly loginButton: Locator;
   private readonly errorMessage: Locator;
+  private readonly closeErrorButton: Locator;
 
   constructor(page: Page) {
     super(page); //Passes the browser page up to BasePage
@@ -14,6 +15,7 @@ export class LoginPage extends BasePage {
     this.passwordInput = page.locator('[data-test="password"]');
     this.loginButton = page.locator('[data-test="login-button"]');
     this.errorMessage = page.locator('[data-test="error"]');
+    this.closeErrorButton = page.locator('[data-test="error-button"]');
   }
 
   //Fullfiling the abstract contract from BasePage
@@ -31,5 +33,13 @@ export class LoginPage extends BasePage {
   //Getter method for assertions
   async getErrorMessageText(): Promise<string | null> {
     return await this.errorMessage.textContent();
+  }
+
+  async dismissErrorMessage(): Promise<void> {
+    await this.closeErrorButton.click();
+  }
+
+  async verifyErrorHidden(): Promise<void> {
+    await expect(this.errorMessage).toBeHidden();
   }
 }

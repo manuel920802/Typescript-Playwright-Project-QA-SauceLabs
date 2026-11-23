@@ -3,6 +3,7 @@ import { LoginPage } from "../pages/LoginPage";
 import { InventoryPage } from "../pages/InventoryPage";
 import { CartPage } from "../pages/CartPage";
 import { CheckoutPage } from "../pages/CheckoutPage";
+import { BookingApiClient } from "../api/BookingApiClient"; // 👈 Import API Client
 
 // 1. Define the TypeScript contract for our custom fixtures
 type PageObjectFixtures = {
@@ -10,6 +11,7 @@ type PageObjectFixtures = {
   inventoryPage: InventoryPage;
   cartPage: CartPage;
   checkoutPage: CheckoutPage;
+  bookingApi: BookingApiClient;
 };
 
 // 2. Extend Playwright's base test with automatic Page Object instantiation
@@ -25,6 +27,10 @@ export const test = base.extend<PageObjectFixtures>({
   },
   checkoutPage: async ({ page }, use) => {
     await use(new CheckoutPage(page));
+  },
+  // 👇 Injects Playwright's APIRequestContext into our OOP API Client
+  bookingApi: async ({ request }, use) => {
+    await use(new BookingApiClient(request));
   },
 });
 

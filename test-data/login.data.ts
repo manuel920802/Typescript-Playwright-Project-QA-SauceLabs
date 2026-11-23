@@ -1,8 +1,8 @@
 import { NegativeLoginCase, UserCredentials } from "./login.types";
 
 export const validUser: UserCredentials = {
-  username: "standard_user",
-  password: "secret_sauce",
+  username: process.env.SAUCE_USERNAME || "standard_user",
+  password: process.env.SAUCE_PASSWORD || "secret_sauce",
 };
 
 export const negativeLoginCases: NegativeLoginCase[] = [

@@ -4,7 +4,7 @@ import { validUser, negativeLoginCases } from "../test-data/login.data";
 test.describe("SauceDemo Authentication Suite", () => {
   // No more 'let loginPage: LoginPage' or 'new LoginPage(page)'!
   test.beforeEach(async ({ loginPage }) => {
-    await loginPage.navigateTo("https://www.saucedemo.com/");
+    await loginPage.navigateTo("/");
     await loginPage.verifyPageLoaded();
   });
 

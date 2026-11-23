@@ -5,7 +5,8 @@ import {
 } from "../test-data/booking.types";
 
 export class BookingApiClient {
-  private readonly baseUrl = "https://restful-booker.herokuapp.com";
+  private readonly baseUrl =
+    process.env.API_BASE_URL || "https://restful-booker.herokuapp.com";
   private readonly request: APIRequestContext;
 
   constructor(request: APIRequestContext) {
@@ -14,8 +15,8 @@ export class BookingApiClient {
 
   // Authenticates and returns a session token for protected endpoints (PUT/DELETE)
   async createAuthToken(
-    username: string = "admin",
-    password: string = "password123",
+    username: string = process.env.API_USERNAME || "admin",
+    password: string = process.env.API_PASSWORD || "password123",
   ): Promise<string> {
     const response = await this.request.post(`${this.baseUrl}/auth`, {
       data: { username, password },

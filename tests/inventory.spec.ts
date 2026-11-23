@@ -1,22 +1,17 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pages/LoginPage";
-import { InventoryPage } from "../pages/InventoryPage";
+import { test, expect } from "../fixtures/pom.fixture";
 import { validUser } from "../test-data/login.data";
 import { products } from "../test-data/inventory.data";
 
 test.describe("SauceDemo Product Catalog & Sorting Suite", () => {
-  let inventoryPage: InventoryPage;
-
-  test.beforeEach(async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    inventoryPage = new InventoryPage(page);
-
+  test.beforeEach(async ({ loginPage, inventoryPage }) => {
     await loginPage.navigateTo("https://www.saucedemo.com/");
     await loginPage.login(validUser.username, validUser.password);
     await inventoryPage.verifyPageLoaded();
   });
 
-  test("Adding and removing products updates the header cart badge", async () => {
+  test("Adding and removing products updates the header cart badge", async ({
+    inventoryPage,
+  }) => {
     await inventoryPage.header.verifyCartCount(0);
 
     //Add two products
@@ -29,7 +24,9 @@ test.describe("SauceDemo Product Catalog & Sorting Suite", () => {
     await inventoryPage.header.verifyCartCount(1);
   });
 
-  test("Sorting products by Price (low to high) orders items ascending", async () => {
+  test("Sorting products by Price (low to high) orders items ascending", async ({
+    inventoryPage,
+  }) => {
     await inventoryPage.sortBy("lohi");
 
     const actualPrices = await inventoryPage.getAllProductPrices();
@@ -38,7 +35,9 @@ test.describe("SauceDemo Product Catalog & Sorting Suite", () => {
     expect(actualPrices).toEqual(expectedSortedPrices);
   });
 
-  test("Sorting products by Name (Z to A) orders items descending", async () => {
+  test("Sorting products by Name (Z to A) orders items descending", async ({
+    inventoryPage,
+  }) => {
     await inventoryPage.sortBy("za");
 
     const actualNames = await inventoryPage.getAllProductNames();
@@ -47,7 +46,10 @@ test.describe("SauceDemo Product Catalog & Sorting Suite", () => {
     expect(actualNames).toEqual(expectedSortedNames);
   });
 
-  test("User can log out via the shared header menu", async ({ page }) => {
+  test("User can log out via the shared header menu", async ({
+    inventoryPage,
+    page,
+  }) => {
     await inventoryPage.header.logout();
     await expect(page).toHaveURL("https://www.saucedemo.com/");
   });

@@ -1,21 +1,32 @@
-import { test as base } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
 import { InventoryPage } from "../pages/InventoryPage";
 import { CartPage } from "../pages/CartPage";
 import { CheckoutPage } from "../pages/CheckoutPage";
-import { BookingApiClient } from "../api/BookingApiClient"; // 👈 Import API Client
+import { BookingApiClient } from "../api/BookingApiClient";
+import { sampleBooking } from "../test-data/booking.data";
+import {
+  BookingPayload,
+  CreateBookingResponse,
+} from "../test-data/booking.types";
 
-// 1. Define the TypeScript contract for our custom fixtures
-type PageObjectFixtures = {
+// Define a clean type for our auto-managed test data
+export type ManagedBooking = {
+  bookingId: number;
+  payload: BookingPayload;
+};
+
+type FrameworkFixtures = {
   loginPage: LoginPage;
   inventoryPage: InventoryPage;
   cartPage: CartPage;
   checkoutPage: CheckoutPage;
   bookingApi: BookingApiClient;
+  createdBooking: ManagedBooking; // 👈 New auto-teardown fixture
 };
 
 // 2. Extend Playwright's base test with automatic Page Object instantiation
-export const test = base.extend<PageObjectFixtures>({
+export const test = base.extend<FrameworkFixtures>({
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
   },
@@ -31,6 +42,30 @@ export const test = base.extend<PageObjectFixtures>({
   // 👇 Injects Playwright's APIRequestContext into our OOP API Client
   bookingApi: async ({ request }, use) => {
     await use(new BookingApiClient(request));
+  },
+
+  // 👇 Fixture Composition: Uses 'bookingApi' to create and auto-delete test data
+  createdBooking: async ({ bookingApi }, use) => {
+    // 1. SETUP: Create a unique booking before the test starts
+    const uniquePayload: BookingPayload = {
+      ...sampleBooking,
+      firstname: `Manuel_${Date.now()}`,
+    };
+
+    const createResponse = await bookingApi.createBooking(uniquePayload);
+    expect(createResponse.status()).toBe(200);
+    const body: CreateBookingResponse = await createResponse.json();
+    const bookingId = body.bookingid;
+
+    // 2. HANDOFF: Pass the created booking to the test block
+    await use({ bookingId, payload: uniquePayload });
+
+    // 3. TEARDOWN: Always runs after the test finishes (even if an assertion failed!)
+    const token = await bookingApi.createAuthToken();
+    const deleteResponse = await bookingApi.deleteBooking(bookingId, token);
+
+    // Note: 201 = deleted successfully, 405 = already deleted by the test itself
+    expect([201, 405]).toContain(deleteResponse.status());
   },
 });
 

@@ -14,7 +14,7 @@ setup(
     await loginPage.login(validUser.username, validUser.password);
 
     // Wait until navigation completes so cookies/localStorage are fully populated
-    await expect(page).toHaveURL("/inventory.html");
+    await expect(page).toHaveURL(/\/inventory\.html$/);
 
     // 👇 Ensures 'playwright/.auth' exists on fresh CI runners before writing user.json
     fs.mkdirSync(authDir, { recursive: true });

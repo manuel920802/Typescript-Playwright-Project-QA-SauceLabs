@@ -1,7 +1,9 @@
 import { test as setup, expect } from "../fixtures/pom.fixture";
 import { validUser } from "../test-data/login.data";
 import path from "path";
+import fs from "fs";
 
+const authDir = path.join(__dirname, "../playwright/.auth");
 const authFile = path.join(__dirname, "../playwright/.auth/user.json");
 
 setup(
@@ -14,7 +16,8 @@ setup(
     // Wait until navigation completes so cookies/localStorage are fully populated
     await expect(page).toHaveURL("/inventory.html");
 
-    // Save cookies and localStorage to user.json
+    // 👇 Ensures 'playwright/.auth' exists on fresh CI runners before writing user.json
+    fs.mkdirSync(authDir, { recursive: true });
     await page.context().storageState({ path: authFile });
   },
 );

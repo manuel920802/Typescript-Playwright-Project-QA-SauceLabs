@@ -1,6 +1,6 @@
 # 🎭 Playwright & TypeScript Full-Stack Automation Framework
 
-[![Playwright Tests](https://github.com)](https://github.com)
+[![Playwright Tests](https://github.com/manuel920802/Typescript-Playwright-Project-QA-SauceLabs/actions/workflows/playwright.yml/badge.svg)](https://github.com/manuel920802/Typescript-Playwright-Project-QA-SauceLabs/actions/workflows/playwright.yml)
 
 An enterprise-grade end-to-end **UI & REST API Test Automation Framework** built with **Playwright** and **TypeScript**, engineered around **Object-Oriented Programming (OOP)** principles, **Dependency Injection**, and **CI/CD** automation.
 

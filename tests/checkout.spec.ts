@@ -5,8 +5,7 @@ import { validCustomer } from "../test-data/checkout.data";
 
 test.describe("SauceDemo End-to-End Checkout Suite", () => {
   test.beforeEach(async ({ loginPage, inventoryPage }) => {
-    await loginPage.navigateTo("/");
-    await loginPage.login(validUser.username, validUser.password);
+    await loginPage.navigateTo("/inventory.html");
     await inventoryPage.verifyPageLoaded();
   });
 

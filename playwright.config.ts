@@ -2,12 +2,10 @@ import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 
-// Load environment variables from .env file
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
+const authFile = path.join(__dirname, "playwright/.auth/user.json");
+
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
@@ -16,40 +14,34 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    // Automatically prepends UI_BASE_URL whenever page.goto('/') is called!
     baseURL: process.env.UI_BASE_URL || "https://saucedemo.com",
     trace: "on-first-retry",
   },
   projects: [
+    // 1. Setup project: Logs in once and writes user.json
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
     },
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
 
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    // 2. Authenticated UI suites: Starts already logged in on /inventory.html
+    {
+      name: "chromium-authenticated",
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: authFile,
+      },
+      dependencies: ["setup"],
+      testMatch: ["**/inventory.spec.ts", "**/checkout.spec.ts"],
+    },
+
+    // 3. Unauthenticated & API suites: Starts with clean browser state
+    {
+      name: "chromium-unauthenticated",
+      use: {
+        ...devices["Desktop Chrome"],
+      },
+      testMatch: ["**/login.spec.ts", "**/api-booking.spec.ts"],
+    },
   ],
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
 });

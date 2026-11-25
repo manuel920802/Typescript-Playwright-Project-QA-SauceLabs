@@ -4,8 +4,7 @@ import { products } from "../test-data/inventory.data";
 
 test.describe("SauceDemo Product Catalog & Sorting Suite", () => {
   test.beforeEach(async ({ loginPage, inventoryPage }) => {
-    await loginPage.navigateTo("/");
-    await loginPage.login(validUser.username, validUser.password);
+    await loginPage.navigateTo("/inventory.html");
     await inventoryPage.verifyPageLoaded();
   });
 

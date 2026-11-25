@@ -32,7 +32,11 @@ export default defineConfig({
         storageState: authFile,
       },
       dependencies: ["setup"],
-      testMatch: ["**/inventory.spec.ts", "**/checkout.spec.ts"],
+      testMatch: [
+        "**/inventory.spec.ts",
+        "**/checkout.spec.ts",
+        "**/network.spec.ts",
+      ],
     },
 
     // 3. Unauthenticated & API suites: Starts with clean browser state

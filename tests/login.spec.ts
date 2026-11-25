@@ -8,13 +8,14 @@ test.describe("SauceDemo Authentication Suite", () => {
     await loginPage.verifyPageLoaded();
   });
 
-  test("Successful login with valid standard user credentials", async ({
-    page,
-    loginPage,
-  }) => {
-    await loginPage.login(validUser.username, validUser.password);
-    await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
-  });
+  test(
+    "Successful login with valid standard user credentials",
+    { tag: ["@smoke", "@auth"] },
+    async ({ page, loginPage }) => {
+      await loginPage.login(validUser.username, validUser.password);
+      await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
+    },
+  );
 
   // Dynamically generates 4 separate tests from our typed dataset!
   for (const testCase of negativeLoginCases) {

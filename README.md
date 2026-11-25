@@ -2,21 +2,22 @@
 
 [![Playwright Tests](https://github.com/manuel920802/Typescript-Playwright-Project-QA-SauceLabs/actions/workflows/playwright.yml/badge.svg)](https://github.com/manuel920802/Typescript-Playwright-Project-QA-SauceLabs/actions/workflows/playwright.yml)
 
-An enterprise-grade end-to-end **UI & REST API Test Automation Framework** built with **Playwright** and **TypeScript**, engineered around **Object-Oriented Programming (OOP)** principles, **Dependency Injection**, **Session State Reuse**, **Network Interception**, and **CI/CD** automation.
+An enterprise-grade end-to-end **UI & REST API Test Automation Framework** built with **Playwright** and **TypeScript**, engineered around **Object-Oriented Programming (OOP)** principles, **Dependency Injection**, **Session State Reuse**, **Network Interception**, **Tag-Based Execution**, and **CI/CD** automation.
 
 ---
 
 ## 🏗️ Architectural Highlights
 
-* **Page Object Model (POM) with Abstraction & Inheritance:** An `abstract class BasePage` enforces page-load contracts (`abstract verifyPageLoaded()`) and encapsulates shared browser navigation across `LoginPage`, `InventoryPage`, `CartPage`, and `CheckoutPage`.
-* **Component Composition:** Reusable UI widgets like `HeaderComponent` (shopping cart badge & navigation menu) are composed inside Page Objects rather than duplicated.
-* **Authentication Session Reuse (`storageState`):** A dedicated `setup` project (`auth.setup.ts`) authenticates once, saves cookies and localStorage to `playwright/.auth/user.json`, and injects that pre-authenticated session into dependent test suites (`chromium-authenticated`) to eliminate redundant UI logins and accelerate execution.
-* **Network Interception & Fault Injection (`page.route` & `page.on`):** Intercepts browser network traffic to abort heavy image assets for faster test execution, inject simulated `500 Internal Server Error` responses to verify frontend resilience, and audit first-party sub-resource HTTP status codes.
-* **Custom Playwright Fixtures (`test.extend`):** Dependency Injection automatically instantiates Page Objects and API clients on demand, eliminating `beforeEach` boilerplate.
-* **Self-Cleaning API Fixtures:** Fixture composition (`createdBooking`) creates unique backend test data via REST API before test execution and guarantees teardown deletion afterward—even when assertions fail.
-* **Strict TypeScript Data Contracts:** Dedicated `.types.ts` interfaces validate UI test datasets and REST API JSON payloads/responses at compile time.
-* **Multi-Environment Configuration (`.env`):** Externalizes base URLs and credentials using `dotenv` and `playwright.config.ts`.
-* **Continuous Integration (GitHub Actions):** Automatically runs all UI & API suites on every push/PR and archives interactive HTML reports and trace artifacts.
+- **Page Object Model (POM) with Abstraction & Inheritance:** An `abstract class BasePage` enforces page-load contracts (`abstract verifyPageLoaded()`) and encapsulates shared browser navigation across `LoginPage`, `InventoryPage`, `CartPage`, and `CheckoutPage`.
+- **Component Composition:** Reusable UI widgets like `HeaderComponent` (shopping cart badge & navigation menu) are composed inside Page Objects rather than duplicated.
+- **Authentication Session Reuse (`storageState`):** A dedicated `setup` project (`auth.setup.ts`) authenticates once, saves cookies and localStorage to `playwright/.auth/user.json`, and injects that pre-authenticated session into dependent test suites (`chromium-authenticated`) to eliminate redundant UI logins and accelerate execution.
+- **Network Interception & Fault Injection (`page.route` & `page.on`):** Intercepts browser network traffic to abort heavy image assets for faster test execution, inject simulated `500 Internal Server Error` responses to verify frontend resilience, and audit first-party sub-resource HTTP status codes.
+- **Custom Playwright Fixtures (`test.extend`):** Dependency Injection automatically instantiates Page Objects and API clients on demand, eliminating `beforeEach` boilerplate.
+- **Self-Cleaning API Fixtures:** Fixture composition (`createdBooking`) creates unique backend test data via REST API before test execution and guarantees teardown deletion afterward—even when assertions fail.
+- **Test Tagging & Executive Step Reporting (`@smoke`, `test.step`):** Organizes suites with native tags (`@smoke`, `@e2e`, `@api`, `@network`) for targeted CI/CD runs and wraps multi-step workflows in `test.step()` blocks for collapsible, time-tracked HTML reports.
+- **Strict TypeScript Data Contracts:** Dedicated `.types.ts` interfaces validate UI test datasets and REST API JSON payloads/responses at compile time.
+- **Multi-Environment Configuration (`.env`):** Externalizes base URLs and credentials using `dotenv` and `playwright.config.ts`.
+- **Continuous Integration (GitHub Actions):** Automatically runs all UI & API suites on every push/PR and archives interactive HTML reports and trace artifacts.
 
 ---
 
@@ -46,13 +47,14 @@ An enterprise-grade end-to-end **UI & REST API Test Automation Framework** built
 │   ├── login.data.ts          # Data-driven authentication scenarios
 │   └── login.types.ts         # Credential & negative test interfaces
 ├── tests/
-│   ├── api-booking.spec.ts    # REST API CRUD & query filtering test suite
+│   ├── api-booking.spec.ts    # REST API CRUD & query filtering suite (@api, @smoke)
 │   ├── auth.setup.ts          # Global authentication setup generating storageState
-│   ├── checkout.spec.ts       # End-to-end purchase & form validation suite
+│   ├── checkout.spec.ts       # End-to-end purchase & step-reported flow (@e2e, @smoke)
 │   ├── inventory.spec.ts      # Catalog badge & dynamic array sorting suite
-│   ├── login.spec.ts          # Positive & data-driven negative auth suite
-│   └── network.spec.ts        # Network interception, asset blocking, & 500 error mocking
+│   ├── login.spec.ts          # Positive & data-driven negative auth suite (@auth, @smoke)
+│   └── network.spec.ts        # Network interception, asset blocking, & 500 mocking (@network)
 ├── .env.example               # Template for required environment variables
+├── package.json               # Dependencies & tag-filtered npm scripts
 └── playwright.config.ts       # Multi-project Playwright & storageState configuration
 ```
 
@@ -61,45 +63,53 @@ An enterprise-grade end-to-end **UI & REST API Test Automation Framework** built
 ## 🚀 Getting Started
 
 ### Prerequisites
-* [Node.js](https://nodejs.org) (v18 or v20+)
-* npm
+
+- [Node.js](https://nodejs.org) (v18 or v20+)
+- npm
 
 ### Installation & Local Execution
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com
    cd Typescript-Playwright-Project-QA-SauceLabs
    ```
 
 2. **Install dependencies and Playwright browsers:**
+
    ```bash
    npm install
    npx playwright install chromium
    ```
 
 3. **Configure environment variables:**
+
    ```bash
    cp .env.example .env
    ```
 
-4. **Run all UI & API tests:**
+4. **Run test suites (full suite or targeted tags):**
+
    ```bash
-   npx playwright test
+   npm test              # Run all UI, API, and Network suites
+   npm run test:smoke    # Run critical path @smoke tests only
+   npm run test:api      # Run REST API CRUD & filter tests (@api)
+   npm run test:e2e      # Run end-to-end checkout flow (@e2e)
    ```
 
 5. **Open the interactive HTML test report:**
    ```bash
-   npx playwright show-report
+   npm run report
    ```
 
 ---
 
 ## 🧪 Automated Test Coverage
 
-* **Global Auth Setup (`auth.setup.ts`):** Logs in once as `standard_user` and persists browser session state for downstream test projects.
-* **Authentication (`login.spec.ts`):** Standard login, data-driven negative scenarios (locked-out user, empty credentials, invalid password), and error banner dismissal.
-* **Catalog & Sorting (`inventory.spec.ts`):** Dynamic cart badge updates, ascending price sorting (`low to high`), descending alphabetical sorting (`Z to A`), and session logout.
-* **End-to-End Checkout (`checkout.spec.ts`):** Multi-item cart verification, shipping form validation, dynamic subtotal + tax math verification, and order confirmation.
-* **Network Resilience (`network.spec.ts`):** Asset blocking (`route.abort()`), simulated CDN `500` server error injection (`route.fulfill()`), and first-party sub-resource HTTP status auditing (`page.on('response')`).
-* **REST API CRUD (`api-booking.spec.ts`):** Token authentication (`POST /auth`), automated booking setup (`POST`), retrieval (`GET`), query parameter filtering, updates (`PUT`), and guaranteed fixture teardown (`DELETE`).
+- **Global Auth Setup (`auth.setup.ts`):** Logs in once as `standard_user` and persists browser session state for downstream test projects.
+- **Authentication (`login.spec.ts`):** Standard login (`@smoke`), data-driven negative scenarios (locked-out user, empty credentials, invalid password), and error banner dismissal.
+- **Catalog & Sorting (`inventory.spec.ts`):** Dynamic cart badge updates, ascending price sorting (`low to high`), descending alphabetical sorting (`Z to A`), and session logout.
+- **End-to-End Checkout (`checkout.spec.ts`):** Step-reported (`test.step`) multi-item cart verification, shipping form validation, dynamic subtotal + tax math verification, and order confirmation (`@smoke`, `@e2e`).
+- **Network Resilience (`network.spec.ts`):** Asset blocking (`route.abort()`), simulated CDN `500` server error injection (`route.fulfill()`), and first-party sub-resource HTTP status auditing (`page.on('response')`).
+- **REST API CRUD (`api-booking.spec.ts`):** Token authentication (`POST /auth`), automated booking setup (`POST`), retrieval (`GET`), query parameter filtering, updates (`PUT`), and guaranteed fixture teardown (`DELETE`).

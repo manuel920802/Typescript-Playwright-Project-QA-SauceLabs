@@ -6,34 +6,35 @@ import {
   BookingIdItem,
 } from "../test-data/booking.types";
 
-test.describe("Restful-Booker REST API CRUD Suite", () => {
-  test("Retrieve and update an existing booking via GET and PUT", async ({
-    bookingApi,
-    createdBooking,
-  }) => {
-    const { bookingId, payload } = createdBooking;
+test.describe("Restful-Booker REST API CRUD Suite", { tag: "@api" }, () => {
+  test(
+    "Retrieve and update an existing booking via GET and PUT",
+    { tag: "@smoke" },
+    async ({ bookingApi, createdBooking }) => {
+      const { bookingId, payload } = createdBooking;
 
-    // 1. GET: Verify the auto-created booking exists
-    const getResponse = await bookingApi.getBooking(bookingId);
-    expect(getResponse.status()).toBe(200);
-    const fetchedBooking: BookingPayload = await getResponse.json();
-    expect(fetchedBooking).toEqual(payload);
+      // 1. GET: Verify the auto-created booking exists
+      const getResponse = await bookingApi.getBooking(bookingId);
+      expect(getResponse.status()).toBe(200);
+      const fetchedBooking: BookingPayload = await getResponse.json();
+      expect(fetchedBooking).toEqual(payload);
 
-    // 2. PUT: Update booking price using auth token
-    const token = await bookingApi.createAuthToken();
-    const updatedPayload: BookingPayload = { ...payload, totalprice: 450 };
+      // 2. PUT: Update booking price using auth token
+      const token = await bookingApi.createAuthToken();
+      const updatedPayload: BookingPayload = { ...payload, totalprice: 450 };
 
-    const updatedResponse = await bookingApi.updateBooking(
-      bookingId,
-      updatedPayload,
-      token,
-    );
-    expect(updatedResponse.status()).toBe(200);
-    const updatedBody: BookingPayload = await updatedResponse.json();
-    expect(updatedBody.totalprice).toBe(450);
+      const updatedResponse = await bookingApi.updateBooking(
+        bookingId,
+        updatedPayload,
+        token,
+      );
+      expect(updatedResponse.status()).toBe(200);
+      const updatedBody: BookingPayload = await updatedResponse.json();
+      expect(updatedBody.totalprice).toBe(450);
 
-    // No manual DELETE needed here — createdBooking teardown handles it automatically!
-  });
+      // No manual DELETE needed here — createdBooking teardown handles it automatically!
+    },
+  );
 
   test("Filter bookings by firstname and lastname", async ({
     bookingApi,

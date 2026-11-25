@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep \"@smoke\"",
+    "test:api": "playwright test --grep \"@api\"",
+    "test:e2e": "playwright test --grep \"@e2e\"",
+    "report": "playwright show-report"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
